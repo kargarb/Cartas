@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartas — Gaby & Marco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --stone-50: #faf9f7;
+            --stone-100: #f0eeea;
+            --stone-200: #e2ded8;
+            --stone-300: #d4cec6;
+            --stone-400: #b0a89e;
+            --stone-500: #8a7d72;
+            --stone-600: #6b5b4e;
+            --stone-700: #4a3f36;
+            --stone-800: #3a3a3a;
+            --cream: #f4f1ec;
+            --warm-white: #fdfcfa;
+            --accent-light: rgba(138,125,114,0.08);
+            --danger: #a04040;
+            --danger-light: #f5eaea;
+            --serif: 'Cormorant Garamond', Georgia, serif;
+            --sans: 'DM Sans', -apple-system, sans-serif;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.1);
+            --radius: 6px;
+        }
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:var(--sans);background:var(--cream);color:var(--stone-800);min-height:100vh;-webkit-font-smoothing:antialiased}
+        .page{max-width:680px;margin:0 auto;padding:48px 24px 80px}
+
+        /* HEADER */
+        .site-header{text-align:center;padding-bottom:40px;margin-bottom:40px;border-bottom:1px solid var(--stone-200)}
+        .site-header__label{font-family:var(--sans);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--stone-400);margin-bottom:12px}
+        .site-header__title{font-family:var(--serif);font-size:36px;font-weight:500;color:var(--stone-700);line-height:1.2;margin-bottom:10px}
+        .site-header__sub{font-family:var(--serif);font-size:16px;font-style:italic;color:var(--stone-400);line-height:1.6}
+        .ornament{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:20px}
+        .ornament__line{width:48px;height:1px;background:var(--stone-300)}
+        .ornament__dot{font-size:10px;color:var(--stone-300)}
+
+        /* DB BAR */
+        .db-bar{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:28px;padding:10px 16px;background:var(--warm-white);border:1px solid var(--stone-200);border-radius:var(--radius);font-size:12px;color:var(--stone-400)}
+        .db-dot{width:7px;height:7px;border-radius:50%;background:var(--stone-300);flex-shrink:0}
+        .db-bar.online .db-dot{background:#6b8f5e;animation:pulse 2s infinite}
+        .db-bar.offline .db-dot{background:var(--danger)}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+        .db-bar a{color:var(--stone-500);cursor:pointer;text-decoration:underline;margin-left:4px}
+
+        /* CONFIG */
+        .config-panel{display:none;background:var(--warm-white);border:1px solid var(--stone-200);border-radius:var(--radius);padding:24px;margin-bottom:28px}
+        .config-panel.visible{display:block}
+        .config-panel__title{font-family:var(--serif);font-size:18px;font-weight:500;color:var(--stone-700);margin-bottom:4px}
+        .config-panel__desc{font-size:13px;color:var(--stone-400);margin-bottom:20px;line-height:1.6}
+        .config-panel__steps{font-size:13px;color:var(--stone-500);line-height:1.8;margin-bottom:20px}
+        .config-panel__steps strong{color:var(--stone-700)}
+        .config-fields{display:flex;flex-direction:column;gap:12px}
+        .config-fields input{width:100%;padding:10px 12px;border:1px solid var(--stone-200);border-radius:var(--radius);font-family:monospace;font-size:13px;color:var(--stone-700);background:var(--stone-50)}
+        .config-fields input:focus{outline:none;border-color:var(--stone-500);background:var(--warm-white)}
+        .config-actions{display:flex;gap:8px;margin-top:16px}
+
+        /* PERSON SELECTOR */
+        .person-selector{display:flex;margin-bottom:28px;border:1px solid var(--stone-200);border-radius:var(--radius);overflow:hidden;background:var(--warm-white)}
+        .person-tab{flex:1;padding:14px 20px;text-align:center;cursor:pointer;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--stone-500);letter-spacing:.5px;transition:all .25s;border:none;background:transparent}
+        .person-tab:first-child{border-right:1px solid var(--stone-200)}
+        .person-tab:hover{background:var(--accent-light)}
+        .person-tab.active{background:var(--stone-700);color:var(--stone-50)}
+        .person-tab .tab-name{display:block;font-family:var(--serif);font-size:18px;font-weight:500;margin-bottom:2px}
+        .person-tab .tab-role{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;opacity:.7}
+
+        /* VIEW TOGGLE */
+        .view-toggle{display:flex;margin-bottom:16px}
+        .view-btn{padding:8px 16px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--stone-200);background:var(--warm-white);color:var(--stone-500);transition:all .2s;font-family:var(--sans)}
+        .view-btn:first-child{border-radius:var(--radius) 0 0 var(--radius)}
+        .view-btn:last-child{border-radius:0 var(--radius) var(--radius) 0;border-left:none}
+        .view-btn.active{background:var(--stone-700);color:var(--stone-50);border-color:var(--stone-700)}
+
+        /* STATS */
+        .stats-row{display:flex;gap:12px;margin-bottom:32px}
+        .stat{flex:1;background:var(--warm-white);border:1px solid var(--stone-200);border-radius:var(--radius);padding:16px;text-align:center}
+        .stat__number{font-family:var(--serif);font-size:28px;font-weight:500;color:var(--stone-700);line-height:1}
+        .stat__label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--stone-400);margin-top:6px}
+
+        /* SECTION LABEL */
+        .section-label{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--stone-400);margin-bottom:16px;padding-left:2px}
+
+        /* LETTERS */
+        .letters-list{margin-bottom:40px}
+        .letter-card{background:var(--warm-white);border:1px solid var(--stone-200);border-radius:var(--radius);padding:20px 24px;margin-bottom:10px;cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:16px;animation:cardIn .3s ease both}
+        .letter-card:hover{border-color:var(--stone-300);box-shadow:var(--shadow-sm);transform:translateY(-1px)}
+        .letter-card__index{font-family:var(--serif);font-size:24px;font-weight:500;color:var(--stone-300);min-width:32px;text-align:center;line-height:1;padding-top:2px}
+        .letter-card__body{flex:1;min-width:0}
+        .letter-card__from{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--stone-400);margin-bottom:4px}
+        .letter-card__title{font-family:var(--serif);font-size:18px;font-weight:500;color:var(--stone-700);line-height:1.3;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .letter-card__date{font-size:12px;color:var(--stone-400)}
+        .letter-card__arrow{color:var(--stone-300);font-size:18px;align-self:center;transition:transform .2s}
+        .letter-card:hover .letter-card__arrow{transform:translateX(3px)}
+        @keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        .empty-state{text-align:center;padding:48px 24px;color:var(--stone-400)}
+        .empty-state__icon{font-size:32px;margin-bottom:12px;opacity:.5}
+        .empty-state__text{font-family:var(--serif);font-size:17px;font-style:italic}
+
+        /* FORM */
+        .write-section{border-top:1px solid var(--stone-200);padding-top:36px}
+        .form-card{background:var(--warm-white);border:1px solid var(--stone-200);border-radius:var(--radius);padding:28px}
+        .form-card__title{font-family:var(--serif);font-size:20px;font-weight:500;color:var(--stone-700);margin-bottom:4px}
+        .form-card__sub{font-size:13px;color:var(--stone-400);margin-bottom:24px}
+        .field{margin-bottom:20px}
+        .field__label{display:block;font-size:12px;font-weight:600;letter-spacing:.5px;color:var(--stone-600);margin-bottom:8px}
+        .field__input,.field__textarea{width:100%;padding:12px 14px;border:1px solid var(--stone-200);border-radius:var(--radius);font-family:var(--serif);font-size:16px;color:var(--stone-800);background:var(--stone-50);transition:border-color .2s,box-shadow .2s}
+        .field__input:focus,.field__textarea:focus{outline:none;border-color:var(--stone-500);box-shadow:0 0 0 3px rgba(138,125,114,.08);background:var(--warm-white)}
+        .field__textarea{resize:vertical;min-height:160px;line-height:1.7}
+        .field__input::placeholder,.field__textarea::placeholder{color:var(--stone-300);font-style:italic}
+        .form-actions{display:flex;gap:10px}
+
+        /* BUTTONS */
+        .btn{padding:12px 24px;border-radius:var(--radius);font-family:var(--sans);font-size:13px;font-weight:600;letter-spacing:.3px;cursor:pointer;transition:all .2s;border:1px solid var(--stone-200);background:var(--warm-white);color:var(--stone-600)}
+        .btn:hover{background:var(--stone-100)}
+        .btn:active{transform:scale(.98)}
+        .btn--primary{background:var(--stone-700);color:var(--stone-50);border-color:var(--stone-700)}
+        .btn--primary:hover{background:var(--stone-800)}
+        .btn--danger{color:var(--danger);border-color:var(--danger-light)}
+        .btn--danger:hover{background:var(--danger-light)}
+        .btn--small{padding:8px 16px;font-size:12px}
+
+        /* MODAL */
+        .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0);align-items:center;justify-content:center;z-index:1000;padding:24px}
+        .modal-overlay.active{display:flex;animation:fadeIn .35s ease forwards}
+        .modal-overlay.closing{animation:fadeOut .3s ease forwards}
+        @keyframes fadeIn{to{background:rgba(0,0,0,.4)}}
+        @keyframes fadeOut{from{background:rgba(0,0,0,.4)}to{background:rgba(0,0,0,0)}}
+        .modal{background:var(--warm-white);border-radius:8px;max-width:580px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
+        .modal-overlay.active .modal{animation:slideUp .4s cubic-bezier(.16,1,.3,1) forwards}
+        .modal-overlay.closing .modal{animation:slideDown .3s ease forwards}
+        @keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes slideDown{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(24px)}}
+        .modal__paper{padding:40px 36px;border-bottom:1px solid var(--stone-200)}
+        .modal__from-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--stone-400);margin-bottom:4px}
+        .modal__header{text-align:center;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--stone-200)}
+        .modal__day{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--stone-400);margin-bottom:10px}
+        .modal__title{font-family:var(--serif);font-size:26px;font-weight:500;color:var(--stone-700);margin-bottom:8px;line-height:1.3}
+        .modal__date{font-size:13px;color:var(--stone-400)}
+        .modal__text{font-family:var(--serif);font-size:17px;line-height:1.85;color:var(--stone-700);white-space:pre-wrap}
+        .modal__signature{text-align:right;margin-top:28px;font-family:var(--serif);font-size:17px;font-style:italic;color:var(--stone-500)}
+        .modal__signature strong{display:block;font-size:20px;font-weight:500;font-style:normal;color:var(--stone-700);margin-top:2px}
+        .modal__footer{padding:16px 36px;display:flex;justify-content:space-between}
+
+        /* TOAST */
+        .toast{position:fixed;bottom:24px;right:24px;background:var(--stone-700);color:var(--stone-50);padding:12px 20px;border-radius:var(--radius);font-size:14px;font-weight:500;box-shadow:var(--shadow-md);transform:translateY(80px);opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1);z-index:2000}
+        .toast.show{transform:translateY(0);opacity:1}
+        .toast.error{background:var(--danger)}
+
+        @media(max-width:600px){
+            .page{padding:32px 16px 60px}
+            .site-header__title{font-size:28px}
+            .stats-row{flex-direction:column;gap:8px}
+            .form-card{padding:20px}
+            .form-actions{flex-direction:column}
+            .form-actions .btn{width:100%;text-align:center}
+            .modal__paper{padding:28px 24px}
+            .modal__footer{padding:12px 24px}
+            .letter-card{padding:16px;gap:12px}
+        }
+    </style>
+</head>
+<body>
+
+<div class="page">
+
+    <header class="site-header">
+        <p class="site-header__label">Correspondencia privada</p>
+        <h1 class="site-header__title">Cartas entre Gaby & Marco</h1>
+        <p class="site-header__sub">Que la distancia no sea impedimento para recordarnos<br>lo mucho que nos queremos.</p>
+        <div class="ornament">
+            <span class="ornament__line"></span>
+            <span class="ornament__dot">&#9826;</span>
+            <span class="ornament__line"></span>
+        </div>
+    </header>
+
+    <!-- DB STATUS -->
+    <div class="db-bar" id="dbBar">
+        <span class="db-dot"></span>
+        <span id="dbLabel">Conectando...</span>
+        <a onclick="toggleConfig()">Configurar</a>
+    </div>
+
+    <!-- CONFIG -->
+    <div class="config-panel" id="configPanel">
+        <h3 class="config-panel__title">Configurar JSONBin.io</h3>
+        <p class="config-panel__desc">
+            JSONBin es un servicio gratuito que guarda un JSON en la nube.
+            Ambos pueden leer y escribir cartas desde cualquier dispositivo.
+        </p>
+        <div class="config-panel__steps">
+            <strong>Setup (solo una vez):</strong><br>
+            1. Ve a <a href="https://jsonbin.io" target="_blank" style="color:var(--stone-600)">jsonbin.io</a> y crea una cuenta gratis<br>
+            2. En API Keys copia tu <strong>Access Key</strong><br>
+            3. Crea un Bin nuevo con este contenido: <code style="background:var(--stone-100);padding:2px 6px;border-radius:3px">{"cartas":[]}</code><br>
+            4. Copia el <strong>Bin ID</strong> de la URL<br>
+            5. Pega ambos aquí abajo
+        </div>
+        <div class="config-fields">
+            <input type="text" id="cfgBinId" placeholder="Bin ID (ej: 665a1f...)">
+            <input type="password" id="cfgApiKey" placeholder="Access Key (ej: $2a$10...)">
+        </div>
+        <div class="config-actions">
+            <button class="btn btn--primary btn--small" onclick="connectDB()">Conectar</button>
+            <button class="btn btn--small" onclick="disconnectDB()">Desconectar</button>
+            <button class="btn btn--small" onclick="toggleConfig()">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- PERSON SELECTOR -->
+    <div class="person-selector">
+        <button class="person-tab active" onclick="switchPerson('gaby')">
+            <span class="tab-name">Gaby</span>
+            <span class="tab-role">escribe a Marco</span>
+        </button>
+        <button class="person-tab" onclick="switchPerson('marco')">
+            <span class="tab-name">Marco</span>
+            <span class="tab-role">escribe a Gaby</span>
+        </button>
+    </div>
+
+    <!-- VIEW TOGGLE -->
+    <div class="view-toggle">
+        <button class="view-btn active" onclick="setView('person')">Por persona</button>
+        <button class="view-btn" onclick="setView('all')">Todas</button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+        <div class="stat">
+            <div class="stat__number" id="countGaby">0</div>
+            <div class="stat__label">De Gaby</div>
+        </div>
+        <div class="stat">
+            <div class="stat__number" id="countMarco">0</div>
+            <div class="stat__label">De Marco</div>
+        </div>
+        <div class="stat">
+            <div class="stat__number" id="countTotal">0</div>
+            <div class="stat__label">Total</div>
+        </div>
+    </div>
+
+    <!-- LETTERS -->
+    <p class="section-label" id="sectionLabel">Cartas de Gaby para Marco</p>
+    <div class="letters-list" id="lettersContainer"></div>
+    <div class="empty-state" id="emptyState" style="display:none;">
+        <div class="empty-state__icon">&#9993;</div>
+        <p class="empty-state__text">Aún no hay cartas. Escribe la primera.</p>
+    </div>
+
+    <!-- WRITE -->
+    <div class="write-section">
+        <div class="form-card">
+            <h2 class="form-card__title" id="formTitle">Escribir como Gaby</h2>
+            <p class="form-card__sub" id="formSub">Tu carta para Marco</p>
+            <form id="letterForm">
+                <div class="field">
+                    <label class="field__label" for="title">Título</label>
+                    <input class="field__input" type="text" id="title" placeholder="Ej: Porque tu sonrisa..." required>
+                </div>
+                <div class="field">
+                    <label class="field__label" for="content">Tu mensaje</label>
+                    <textarea class="field__textarea" id="content" placeholder="Escribe lo que quieras que sepa..." required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn--primary">Guardar carta</button>
+                    <button type="button" class="btn" onclick="document.getElementById('letterForm').reset()">Limpiar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <div class="modal__paper">
+            <div class="modal__header">
+                <p class="modal__from-label" id="modalFrom"></p>
+                <p class="modal__day" id="modalDay"></p>
+                <h2 class="modal__title" id="modalTitle"></h2>
+                <p class="modal__date" id="modalDate"></p>
+            </div>
+            <div class="modal__text" id="modalText"></div>
+            <div class="modal__signature" id="modalSignature"></div>
+        </div>
+        <div class="modal__footer">
+            <button class="btn btn--small" onclick="closeModal()">Cerrar</button>
+            <button class="btn btn--small btn--danger" onclick="deleteCurrentLetter()">Eliminar</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════
+// JSONBIN.IO — Tu JSON en la nube, gratis
+//
+// Estructura del bin:
+// {
+//   "cartas": [
+//     {
+//       "id": "1719500000000",
+//       "from": "gaby",          // o "marco"
+//       "title": "Porque tu...",
+//       "content": "Texto largo",
+//       "ts": 1719500000000
+//     }
+//   ]
+// }
+// ════════════════════════════════════════════════
+
+const JSONBIN_API = 'https://api.jsonbin.io/v3/b';
+let binId = '';
+let apiKey = '';
+let dbConnected = false;
+let allCartas = [];
+
+let currentPerson = 'gaby';
+let currentView = 'person';
+let currentLetterId = null;
+
+const people = {
+    gaby:  { name: 'Gaby',  to: 'Marco', sign: 'Con todo mi cariño' },
+    marco: { name: 'Marco', to: 'Gaby',  sign: 'Siempre tuyo' }
+};
+
+// ── HELPERS ──
+function notify(msg, isError = false) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'toast show' + (isError ? ' error' : '');
+    setTimeout(() => el.className = 'toast', 3000);
+}
+
+function esc(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+
+function fmtDate(ts) {
+    return new Date(ts).toLocaleDateString('es-MX', { year:'numeric', month:'long', day:'numeric' });
+}
+
+function setDbStatus(online) {
+    dbConnected = online;
+    document.getElementById('dbBar').className = 'db-bar ' + (online ? 'online' : 'offline');
+    document.getElementById('dbLabel').textContent = online ? 'JSONBin conectado — sincronizado' : 'Sin conexión — modo local';
+}
+
+function toggleConfig() { document.getElementById('configPanel').classList.toggle('visible'); }
+
+// ── JSONBIN READ/WRITE ──
+async function fetchBin() {
+    const r = await fetch(`${JSONBIN_API}/${binId}/latest`, { headers: { 'X-Access-Key': apiKey } });
+    if (!r.ok) throw new Error('Bin error: ' + r.status);
+    const d = await r.json();
+    return d.record.cartas || [];
+}
+
+async function writeBin(cartas) {
+    const r = await fetch(`${JSONBIN_API}/${binId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-Access-Key': apiKey },
+        body: JSON.stringify({ cartas })
+    });
+    if (!r.ok) throw new Error('Write error: ' + r.status);
+}
+
+// ── LOCAL FALLBACK ──
+function loadLocal() { try { return JSON.parse(localStorage.getItem('cartas_data') || '[]'); } catch { return []; } }
+function saveLocal(c) { localStorage.setItem('cartas_data', JSON.stringify(c)); }
+
+// ── DATA LAYER ──
+async function loadCartas() {
+    if (dbConnected) {
+        try {
+            allCartas = await fetchBin();
+            saveLocal(allCartas);
+            return;
+        } catch (e) { console.error(e); notify('Error leyendo JSONBin, usando local', true); }
+    }
+    allCartas = loadLocal();
+}
+
+async function saveCartas() {
+    saveLocal(allCartas);
+    if (dbConnected) {
+        try { await writeBin(allCartas); }
+        catch (e) { console.error(e); notify('Error guardando en JSONBin', true); }
+    }
+}
+
+// ── DB CONNECT/DISCONNECT ──
+async function connectDB() {
+    const id = document.getElementById('cfgBinId').value.trim();
+    const key = document.getElementById('cfgApiKey').value.trim();
+    if (!id || !key) { notify('Completa ambos campos', true); return; }
+    binId = id; apiKey = key;
+    try {
+        await fetchBin();
+        dbConnected = true;
+        localStorage.setItem('jsonbin_config', JSON.stringify({ binId, apiKey }));
+        setDbStatus(true);
+        toggleConfig();
+        await render();
+        notify('Conectado a JSONBin');
+    } catch (e) {
+        console.error(e);
+        notify('Error: ' + e.message, true);
+        setDbStatus(false);
+    }
+}
+
+function disconnectDB() {
+    dbConnected = false; binId = ''; apiKey = '';
+    localStorage.removeItem('jsonbin_config');
+    document.getElementById('cfgBinId').value = '';
+    document.getElementById('cfgApiKey').value = '';
+    setDbStatus(false);
+    render();
+    notify('Desconectado — modo local');
+}
+
+// ── RENDER ──
+function getFiltered() {
+    const sorted = [...allCartas].sort((a, b) => a.ts - b.ts);
+    return currentView === 'all' ? sorted : sorted.filter(c => c.from === currentPerson);
+}
+
+function updateStats() {
+    document.getElementById('countGaby').textContent = allCartas.filter(c => c.from === 'gaby').length;
+    document.getElementById('countMarco').textContent = allCartas.filter(c => c.from === 'marco').length;
+    document.getElementById('countTotal').textContent = allCartas.length;
+}
+
+function updateLabels() {
+    const p = people[currentPerson];
+    document.getElementById('formTitle').textContent = `Escribir como ${p.name}`;
+    document.getElementById('formSub').textContent = `Tu carta para ${p.to}`;
+    document.getElementById('sectionLabel').textContent = currentView === 'all'
+        ? 'Todas las cartas'
+        : `Cartas de ${p.name} para ${p.to}`;
+}
+
+function renderLetters() {
+    const letters = getFiltered();
+    const container = document.getElementById('lettersContainer');
+    const empty = document.getElementById('emptyState');
+    if (!letters.length) { container.innerHTML = ''; empty.style.display = 'block'; updateStats(); return; }
+    empty.style.display = 'none';
+    container.innerHTML = letters.map((c, i) => {
+        const p = people[c.from];
+        return `<div class="letter-card" style="animation-delay:${i*.04}s" onclick="openLetter('${c.id}')">
+            <div class="letter-card__index">${i+1}</div>
+            <div class="letter-card__body">
+                <p class="letter-card__from">De ${esc(p.name)} para ${esc(p.to)}</p>
+                <h3 class="letter-card__title">${esc(c.title)}</h3>
+                <p class="letter-card__date">${fmtDate(c.ts)}</p>
+            </div>
+            <span class="letter-card__arrow">&rsaquo;</span>
+        </div>`;
+    }).join('');
+    updateStats();
+}
+
+async function render() { await loadCartas(); updateStats(); updateLabels(); renderLetters(); }
+
+// ── SWITCHING ──
+function switchPerson(p) {
+    currentPerson = p;
+    document.querySelectorAll('.person-tab').forEach((t, i) => t.classList.toggle('active', (i===0&&p==='gaby')||(i===1&&p==='marco')));
+    updateLabels(); renderLetters();
+}
+
+function setView(v) {
+    currentView = v;
+    document.querySelectorAll('.view-btn').forEach((b, i) => b.classList.toggle('active', (i===0&&v==='person')||(i===1&&v==='all')));
+    updateLabels(); renderLetters();
+}
+
+// ── MODAL ──
+function openLetter(id) {
+    const c = allCartas.find(l => l.id === id);
+    if (!c) return;
+    currentLetterId = id;
+    const p = people[c.from];
+    const filtered = getFiltered();
+    const idx = filtered.findIndex(l => l.id === id);
+    document.getElementById('modalFrom').textContent = `Carta de ${p.name} para ${p.to}`;
+    document.getElementById('modalDay').textContent = `Carta ${idx+1} de ${filtered.length}`;
+    document.getElementById('modalTitle').textContent = c.title;
+    document.getElementById('modalDate').textContent = fmtDate(c.ts);
+    document.getElementById('modalText').textContent = c.content;
+    document.getElementById('modalSignature').innerHTML = `${p.sign},<strong>${p.name}</strong>`;
+    const o = document.getElementById('modalOverlay');
+    o.classList.remove('closing');
+    o.classList.add('active');
+}
+
+function closeModal() {
+    const o = document.getElementById('modalOverlay');
+    o.classList.add('closing');
+    setTimeout(() => { o.classList.remove('active','closing'); currentLetterId = null; }, 300);
+}
+
+async function deleteCurrentLetter() {
+    if (!currentLetterId || !confirm('¿Eliminar esta carta?')) return;
+    allCartas = allCartas.filter(c => c.id !== currentLetterId);
+    await saveCartas();
+    renderLetters(); updateStats(); closeModal();
+    notify('Carta eliminada');
+}
+
+// ── FORM ──
+document.getElementById('letterForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const t = document.getElementById('title').value.trim();
+    const c = document.getElementById('content').value.trim();
+    if (!t || !c) { notify('Completa todos los campos', true); return; }
+    allCartas.push({ id: Date.now().toString(), from: currentPerson, title: t, content: c, ts: Date.now() });
+    await saveCartas();
+    renderLetters(); updateStats();
+    document.getElementById('letterForm').reset();
+    notify('Carta guardada');
+});
+
+// ── EVENTS ──
+document.getElementById('modalOverlay').addEventListener('click', (e) => { if (e.target === document.getElementById('modalOverlay')) closeModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && document.getElementById('modalOverlay').classList.contains('active')) closeModal(); });
+
+// ── INIT ──
+(async () => {
+    const saved = localStorage.getItem('jsonbin_config');
+    if (saved) {
+        try {
+            const cfg = JSON.parse(saved);
+            binId = cfg.binId; apiKey = cfg.apiKey;
+            document.getElementById('cfgBinId').value = binId;
+            document.getElementById('cfgApiKey').value = apiKey;
+            await fetchBin();
+            dbConnected = true;
+            setDbStatus(true);
+        } catch { setDbStatus(false); }
+    } else { setDbStatus(false); }
+    await render();
+})();
+</script>
+
+</body>
+</html>
